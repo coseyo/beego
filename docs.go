@@ -14,22 +14,25 @@
 
 package beego
 
-import (
-	"github.com/astaxie/beego/context"
-)
+import "github.com/astaxie/beego/context"
 
 // GlobalDocAPI store the swagger api documents
 var GlobalDocAPI = make(map[string]interface{})
 
 func serverDocs(ctx *context.Context) {
 	var obj interface{}
-	if splat := ctx.Input.Param(":splat"); splat == "" {
+	splat := ctx.Input.Param(":splat")
+	if splat == "docs" {
+		splat = ""
+	}
+	if splat == "" {
 		obj = GlobalDocAPI["Root"]
 	} else {
 		if v, ok := GlobalDocAPI[splat]; ok {
 			obj = v
 		}
 	}
+
 	if obj != nil {
 		ctx.Output.Header("Access-Control-Allow-Origin", "*")
 		ctx.Output.JSON(obj, false, false)
