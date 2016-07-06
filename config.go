@@ -184,17 +184,25 @@ func ParseConfig() (err error) {
 	AppPath, _ = filepath.Abs(filepath.Dir(os.Args[0]))
 	workPath, _ := os.Getwd()
 	workPath, _ = filepath.Abs(workPath)
+	isRelative := 0
 
 	if AppConfigPath == "" {
 		// initialize default configurations
 		AppConfigPath = filepath.Join(AppPath, "conf", "app.conf")
 		if !utils.FileExists(AppConfigPath) {
-			AppConfig = &beegoAppConfig{config.NewFakeConfig()}
-			return
+			if utils.FileExists(filepath.Join("conf", "app.conf")) {
+				isRelative = 1
+				AppConfigPath = filepath.Join("conf", "app.conf")
+			} else {
+				AppConfig = &beegoAppConfig{config.NewFakeConfig()}
+				return
+			}
+		} else {
+
 		}
 	}
 
-	if workPath != AppPath {
+	if workPath != AppPath && isRelative == 0 {
 		os.Chdir(AppPath)
 	}
 
